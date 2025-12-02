@@ -9,9 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
 class User
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\GeneratedValue(strategy: "AUTO")]
+    #[ORM\Column(type: "integer")]
     private ?int $idUser = null;
+
 
     #[ORM\Column(length: 255)]
     private ?string $firstName = null;

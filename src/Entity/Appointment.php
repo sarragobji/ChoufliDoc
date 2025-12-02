@@ -10,9 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
 class Appointment
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\GeneratedValue(strategy: "AUTO")]
+    #[ORM\Column(type: "integer")]
     private ?int $idAppointment = null;
+
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $dateAppointment = null;

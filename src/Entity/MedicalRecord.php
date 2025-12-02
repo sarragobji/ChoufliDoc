@@ -9,9 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
 class MedicalRecord
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\GeneratedValue(strategy: "AUTO")]
+    #[ORM\Column(type: "integer")]
     private ?int $idMedRec = null;
+
 
     public function getIdMedRec(): ?int
     {
