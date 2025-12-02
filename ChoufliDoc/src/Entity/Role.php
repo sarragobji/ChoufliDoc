@@ -10,11 +10,27 @@ class Role
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: "integer")]
+    private ?int $RoleId = null;
 
-    public function getId(): ?int
+    #[ORM\Column(length: 50)]
+    private ?string $RoleName = null;
+
+    // --- Getters & Setters ---
+
+    public function getRoleId(): ?int
     {
-        return $this->id;
+        return $this->RoleId;
+    }
+
+    public function getRoleName(): ?string
+    {
+        return $this->RoleName;
+    }
+
+    public function setRoleName(string $RoleName): static
+    {
+        $this->RoleName = $RoleName;
+        return $this;
     }
 }
