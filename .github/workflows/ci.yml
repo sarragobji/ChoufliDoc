@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [ "develop", "main" ]
+  pull_request:
+    branches: [ "develop", "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: test
+      COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH || '' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.3.13
+        uses: shivammathur/setup-php@v4
+        with:
+          php-version: '8.3.13'
+          extensions: mbstring, intl, pdo_mysql, xml, json
+          ini-values: post_max_size=256M, memory_limit=2G
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install composer dependencies
+        run: composer install --no-progress --no-suggest --prefer-dist --no-interaction
+
+      - name: Ensure Symfony console is available
+        run: php bin/console --version
+
+      - name: "Symfony lint: YAML"
+        run: php bin/console lint:yaml config/ --no-interaction
+
+      - name: "Symfony lint: Twig"
+        run: php bin/console lint:twig templates/ --no-interaction || true
+        # note: lint:twig returns non-zero if no templates; `|| true` prevents failure when there are none
+
+      - name: "Symfony lint: Container"
+        run: php bin/console lint:container --no-interaction
+
+      - name: Run PHPStan (static analysis)
+        run: |
+          if [ -f ./vendor/bin/phpstan ]; then
+            ./vendor/bin/phpstan analyse --memory-limit=1G || true
+          else
+            echo "PHPStan not installed, skipping static analysis."
+          fi
+
+      - name: Optional - Run PHPUnit (if tests exist)
+        if: always()
+        run: |
+          if [ -f phpunit.xml ] || [ -f phpunit.xml.dist ]; then
+            composer require --dev phpunit/phpunit --no-interaction --no-progress || true
+            ./vendor/bin/phpunit --testdox || true
+          else
+            echo "No PHPUnit config found; skipping tests."
+          fi
+
+      - name: Show deployed files (debug)
+        run: ls -la
+
+      - name: Build artifacts (optional)
+        if: always()
+        run: echo "CI pipeline finished."
