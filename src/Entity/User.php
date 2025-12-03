@@ -6,9 +6,11 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "AUTO")]
@@ -146,7 +148,9 @@ class User
         $this->password = $password;
         return $this;
     }
-
+ public function eraseCredentials(): void
+    {
+    }
     // ---- RELATIONS ----
     
     // Many Users can have many Roles
