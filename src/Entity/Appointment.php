@@ -11,34 +11,36 @@ class Appointment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "AUTO")]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(name: "idAppointment", type: "integer")]
     private ?int $idAppointment = null;
 
-
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $dateAppointment = null;
+    private ?\DateTimeInterface $dateAppointment = null;
+
+    // Relations
+    // Many Appointments can be booked by one User (as Patient)
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "appointmentsTaken")]
+    #[ORM\JoinColumn(name: "patient_id", referencedColumnName: "id_user", nullable: false)]
+    private ?User $patient = null;
+
+    // Many Appointments can be assigned to one User (as Doctor)
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "appointmentsPassed")]
+    #[ORM\JoinColumn(name: "doctor_id", referencedColumnName: "id_user", nullable: false)]
+    private ?User $doctor = null;
 
     public function getIdAppointment(): ?int
     {
         return $this->idAppointment;
     }
 
-    public function setIdAppointment(int $idAppointment): static
-    {
-        $this->idAppointment = $idAppointment;
-
-        return $this;
-    }
-
-    public function getDateAppointment(): ?\DateTime
+    public function getDateAppointment(): ?\DateTimeInterface
     {
         return $this->dateAppointment;
     }
 
-    public function setDateAppointment(\DateTime $dateAppointment): static
+    public function setDateAppointment(\DateTimeInterface $dateAppointment): static
     {
         $this->dateAppointment = $dateAppointment;
-
         return $this;
     }
 }
