@@ -1,5 +1,5 @@
 <?php
-
+/*
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,4 +26,4 @@ final class LoginController extends AbstractController
     {
         throw new \LogicException('This method can be blank.');
     }
-}
+}*/
