@@ -16,14 +16,15 @@
                 <div class="card o-hidden border-0 shadow-lg my-5">
                     <div class="card-body p-0">
                         <div class="row">
-                            <div class="col-lg-6 d-none d-lg-block bg-login-image">
-                                {# You can set the background image for this div in your CSS #}
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="p-5">
-                                    <div class="text-center">
-                                        <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
-                                    </div>
+                        {# Image on the left #}
+                        <div class="col-lg-5 d-none d-lg-block p-0">
+                            <img src="{{ asset('images/login.jpg') }}" class="img-fluid w-100 h-100" >
+                        </div>
+                             <div class="col-lg-7">
+                    <div class="p-5">
+                        <div class="text-center">
+                            <h1 class="h4 text-gray-900 mb-4">Welcome back !</h1>
+                        </div>
 
                                     <form class="user" method="post">
                                         {% if error %}
