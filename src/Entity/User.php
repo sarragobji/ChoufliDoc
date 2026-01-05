@@ -6,10 +6,12 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -149,8 +151,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
  public function eraseCredentials(): void
-    {
-    }
+                   {
+                   }
     // ---- RELATIONS ----
     
     // Many Users can have many Roles
@@ -171,4 +173,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // One User can consult many MedicalRecords
     #[ORM\OneToMany(mappedBy: "consultedBy", targetEntity: MedicalRecord::class)]
     private Collection $medicalRecordsConsulted;
+
+    #[ORM\Column]
+    private bool $isVerified = false;
+
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+
+        return $this;
+    }
 }
