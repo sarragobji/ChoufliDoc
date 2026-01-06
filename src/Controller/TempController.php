@@ -1,5 +1,6 @@
 <?php
 
+/*
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,4 +20,4 @@ class TempController extends AbstractController
     {
         return new Response('<h1>Admin temporary dashboard</h1>');
     }
-}
+}*/

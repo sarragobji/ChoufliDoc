@@ -48,12 +48,12 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
 
         if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
             return new RedirectResponse(
-                $this->urlGenerator->generate('admin_temp')
+                $this->urlGenerator->generate('app_admin')
             );
         }
 
         return new RedirectResponse(
-            $this->urlGenerator->generate('user_temp')
+            $this->urlGenerator->generate('app_home')
         );
     }
     protected function getLoginUrl(Request $request): string
