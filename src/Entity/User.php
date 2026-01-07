@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
@@ -42,6 +43,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?string $password = null;
+
+    // Plain password used only for forms (not persisted)
+    private ?string $plainPassword = null;
 
     // ---- CONSTRUCTOR ----
     public function __construct()
@@ -150,9 +154,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->password = $password;
         return $this;
     }
- public function eraseCredentials(): void
-                   {
-                   }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): static
+    {
+        $this->plainPassword = $plainPassword;
+        return $this;
+    }
+
+    public function eraseCredentials(): void
+    {
+        $this->plainPassword = null;
+    }
     // ---- RELATIONS ----
     
     // Many Users can have many Roles
@@ -193,4 +210,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     return $this->firstName . ' ' . $this->lastName;
 }
 
+    // Full name helper
+    public function getFullName(): string
+    {
+        return $this->firstName.' '.$this->lastName;
+    }
 }
