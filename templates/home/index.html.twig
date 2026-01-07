@@ -2,8 +2,9 @@
 
 {% block title %}Home{% endblock %}
 {% block stylesheets %}
-    <link href="{{ asset('css/home.css') }}" rel="stylesheet">
+<link href="{{ asset('css/home.css') }}" rel="stylesheet">
 {% endblock %}
+
 {% block body %}
 <main class="flex-shrink-0">
 
@@ -37,12 +38,12 @@
                 <!-- Text -->
                 <div class="col-xxl-5 text-center text-xxl-start">
 
-                    <div class="fs-3 fw-light text-muted">
-                        I can help you fix your trauma
+                    <div class="fs-3  text-muted">
+                        <span class="fw-light"> You don’t have to face trauma alone</span>
                     </div>
 
                     <h1 class="display-3 fw-bolder mb-5">
-                        <span class="text-gradient d-inline">book an appointment now !</span>
+                        <span class="text-gradient d-inline">Let’s begin your healing journey today</span>
                     </h1>
 
                     <div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xxl-start">
@@ -66,42 +67,96 @@
             </div>
         </div>
     </header>
+<section class="bg-light py-5 about-section">
+    <div class="container px-5">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-lg-6 text-center my-5">
+                <h2 class="display-5 fw-bolder">
+                    <span class="text-gradient d-inline">About Us</span>
+                </h2>
+                <p class="lead fw-light mb-4">
+                   Notre cabinet, situé au cœur de Tunis, offre un environnement chaleureux et confidentiel dédié à la santé mentale et au bien-être émotionnel. Nous proposons des consultations personnalisées, alliant expertise médicale et 
+                   techniques thérapeutiques comme l’hypnose, pour accompagner chaque patient vers un mieux-être durable.
+                <p class="text-muted">
+                    Avenu hbib thameur, centre ville, tunis, immeuble Jannet arafa.
+                </p>
+            </div>
 
-    <!-- About -->
-    <section class="bg-light py-5">
-        <div class="container px-5">
-            <div class="row justify-content-center">
-                <div class="col-xxl-8 text-center my-5">
+            
+        </div>
+    </div>
+</section>
+   <section class="bg-light py-5 about-section">
+    <div class="container px-5">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-lg-6 text-center my-5">
+                <h2 class="display-5 fw-bolder">
+                    <span class="text-gradient d-inline">DR Slimen Labyedh</span>
+                </h2>
+                <p class="lead fw-light mb-4">
+                   Psychothérapeute et professeur diplômé de la Faculté de Médecine de Tunis, spécialisé 
+                   dans la prise en charge thérapeutique par l’hypnose pour favoriser le bien-être mental et émotionnel.
+                
+            </div>
 
-                    <h2 class="display-5 fw-bolder">
-                        <span class="text-gradient d-inline"> About us </span>
-                    </h2>
-
-                    <p class="lead fw-light mb-4">
-                       A specialized practitioner focused on the diagnosis, treatment, and prevention of mental, emotional, and behavioral disorders. Utilizing evidence-based therapeutic techniques and clinical assessment, I work collaboratively with patients to develop personalized treatment plans that promote long-term psychological health and functional recovery.
-                    </p>
-
-                    <p class="text-muted">
-                     Avenu hbib thameur, centre ville, tunis, immeuble Jannet arafa.
-                    </p>
-
-                    <div class="d-flex justify-content-center fs-2 gap-4">
-                        <a class="text-gradient" href="#"><i class="bi bi-twitter"></i></a>
-                        <a class="text-gradient" href="#"><i class="bi bi-facebook"></i></a>
-                        <a class="text-gradient" href="#"><i class="bi bi-instagram"></i></a>
-                    </div>
-
-                </div>
+            <!-- Image column -->
+            <div class="col-lg-6 text-center my-5">
+                <img src="{{ asset('images/slimen2.png') }}" class="about-img"  />
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
 
 </main>
 
 <!-- Footer -->
-<footer class="bg-white py-4 mt-auto">
+<footer class="bg-white py-4 mt-auto border-top">
     <div class="container px-5">
-       
+        <div class="row align-items-center justify-content-between">
+            
+            <!-- Logo / Cabinet Name -->
+            <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                <h5 class="fw-bold">Cabinet Psychothérapie Tunis</h5>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="col-md-4 text-center mb-3 mb-md-0">
+                <p class="mb-1">📍 Avenu Hbib Thameur, Centre Ville, Tunis</p>
+                <p class="mb-0">📞 +216 XX XXX XXX | ✉️ contact@cabinet.tn</p>
+            </div>
+
+            <!-- Social Media Icons -->
+            <div class="col-md-4 text-center text-md-end">
+                <a href="#" class="text-dark mx-2 fs-5"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="text-dark mx-2 fs-5"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-dark mx-2 fs-5"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+
+        </div>
+
+        <hr class="my-3">
+
+        <div class="row">
+            <div class="col text-center text-muted">
+                &copy; {{ "now"|date("Y") }} Cabinet Psychothérapie Tunis. Tous droits réservés.
+            </div>
+        </div>
     </div>
 </footer>
+
 {% endblock %}
+{% block javascripts %}
+<script>
+    window.addEventListener('scroll', function() {
+        const image = document.querySelector('.about-img');
+        const scrollTop = window.scrollY;
+        const offset = 70; // max move in px
+        // Move image down slowly as you scroll
+        if(image){
+            image.style.transform = `translateY(${Math.min(scrollTop / 5, offset)}px)`;
+        }
+    });
+</script>
+{% endblock %}
+

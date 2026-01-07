@@ -5,14 +5,11 @@
 
     <title>{% block title %}ChoufliDoc{% endblock %}</title>
 
-    <!-- Responsive -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- SEO -->
     <meta name="description" content="{% block meta_description %}Modern healthcare platform{% endblock %}">
     <meta name="author" content="ChoufliDoc">
 
-    <!-- Favicon -->
     <link rel="icon" href="{{ asset('images/favicon.ico') }}">
 
     <!-- Google Font -->
@@ -22,16 +19,11 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-..."
-          crossorigin="anonymous">
+          rel="stylesheet">
 
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
           rel="stylesheet">
-
-    <!-- Global CSS -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
     {% block stylesheets %}{% endblock %}
 </head>
@@ -41,12 +33,7 @@
     {% block body %}{% endblock %}
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-..."
-            crossorigin="anonymous"></script>
-
-    <!-- App JS -->
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     {% block javascripts %}{% endblock %}
 </body>
