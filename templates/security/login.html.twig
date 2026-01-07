@@ -9,6 +9,27 @@
 {% endblock %}
 
 {% block body %}
+<!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
+        <div class="container px-5">
+            <a class="navbar-brand" href="{{ path('app_home') }}">
+                <span class="fw-bolder text-primary">Choufli DOC</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 small fw-bolder">
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_home') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 <div class="bg-gradient-primary vh-100">
     <div class="container">
         <div class="row justify-content-center">
@@ -16,61 +37,59 @@
                 <div class="card o-hidden border-0 shadow-lg my-5">
                     <div class="card-body p-0">
                         <div class="row">
-                        {# Image on the left #}
-                        <div class="col-lg-5 d-none d-lg-block p-0">
-                            <img src="{{ asset('images/login.jpg') }}" class="img-fluid w-100 h-100" >
-                        </div>
-                             <div class="col-lg-7">
-                    <div class="p-5">
-                        <div class="text-center">
-                            <h1 class="h4 text-gray-900 mb-4">Welcome back !</h1>
-                        </div>
+    {# Form on the LEFT #}
+    <div class="col-lg-7">
+        <div class="p-5">
+            <div class="text-center">
+                <h1 class="h4 text-gray-900 mb-4">Welcome back !</h1>
+            </div>
 
-                                    <form class="user" method="post">
-                                        {% if error %}
-                                            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-                                        {% endif %}
+            <form class="user" method="post">
+                {% if error %}
+                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
 
-                                        <div class="form-group">
-                                            <input type="email" value="{{ last_username }}" name="email" id="inputEmail" 
-                                                   class="form-control form-control-user" 
-                                                   placeholder="Enter Email Address..." autocomplete="email" required autofocus>
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="password" name="password" id="inputPassword" 
-                                                   class="form-control form-control-user" 
-                                                   placeholder="Password" autocomplete="current-password" required>
-                                        </div>
+                <div class="form-group">
+                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" 
+                           class="form-control form-control-user" 
+                           placeholder="Enter Email Address..." autocomplete="email" required autofocus>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" id="inputPassword" 
+                           class="form-control form-control-user" 
+                           placeholder="Password" autocomplete="current-password" required>
+                </div>
 
-                                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-                                        <div class="form-group">
-                                            <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck" name="_remember_me">
-                                                <label class="custom-control-label" for="customCheck">Remember Me</label>
-                                            </div>
-                                        </div>
-
-                                        <button type="submit" class="btn btn-primary btn-user btn-block">
-                                            Login
-                                        </button>
-                                        
-                                        
-                                    </form>
-                                    
-                                    <hr>
-                                    <div class="text-center">
-                                        <a class="small" href="#">Forgot Password?</a>
-                                    </div>
-                                    <div class="text-center">
-                                        <a class="small" href="{{ path('app_register') }}">Create an Account!</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox small">
+                        <input type="checkbox" class="custom-control-input" id="customCheck" name="_remember_me">
+                        <label class="custom-control-label" for="customCheck">Remember Me</label>
                     </div>
                 </div>
+
+                <button type="submit" class="btn btn-primary btn-user btn-block">
+                    Login
+                </button>
+            </form>
+
+            <hr>
+            <div class="text-center">
+                <a class="small" href="#">Forgot Password?</a>
             </div>
+            <div class="text-center">
+                <a class="small" href="{{ path('app_register') }}">Create an Account!</a>
+            </div>
+        </div>
+    </div>
+
+    {# Image on the RIGHT #}
+    <div class="col-lg-5 d-none d-lg-block p-0">
+        <img src="{{ asset('images/dalindaa.png') }}" class="img-fluid w-100 h-100" >
+    </div>
+</div>
+
         </div>
     </div>
 </div>

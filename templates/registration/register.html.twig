@@ -9,6 +9,27 @@
 {% endblock %}
 
 {% block body %}
+ <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
+        <div class="container px-5">
+            <a class="navbar-brand" href="{{ path('app_home') }}">
+                <span class="fw-bolder text-primary">Choufli DOC</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 small fw-bolder">
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_home') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 <div class="bg-gradient-primary vh-100">
     <div class="container">
         <div class="card o-hidden border-0 shadow-lg my-5">
