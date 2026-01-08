@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class AppointmentType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
+    { 
         $role = $options['role'];
 
         $builder->add('dateAppointment', DateType::class, [

@@ -14,7 +14,9 @@
         <a href="{{ path('app_home') }}" class="btn btn-outline-primary me-2">
             <i class="bi bi-house"></i> Home
         </a>
-
+        <a href="{{ path('appointment_request') }}" class="btn btn-outline-primary">
+            <i class="bi bi-box-arrow-right"></i> Book Appointment
+        </a>
         <a href="{{ path('app_logout') }}" class="btn btn-outline-danger">
             <i class="bi bi-box-arrow-right"></i> Logout
         </a>
@@ -58,6 +60,7 @@
                         <tr>
                             <th>Date</th>
                             <th>Doctor</th>
+                            <th>Status</th>
                             <th class="text-end">Action</th>
                         </tr>
                     </thead>
@@ -66,6 +69,11 @@
                         <tr>
                             <td>{{ appointment.dateAppointment|date('d/m/Y') }}</td>
                             <td>{{ appointment.doctor }}</td>
+                            <td>
+                                <span class="badge bg-{{ appointment.status == 'pending' ? 'warning' : 'success' }}">
+                                    {{ appointment.status|capitalize }}
+                                </span>
+                            </td>
                             <td class="text-end">
                                 <form method="post"
                                       action="{{ path('appointment_cancel', {id: appointment.idAppointment}) }}"

@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\UserRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/appointment')]
@@ -127,6 +128,34 @@ class AppointmentController extends AbstractController
 
         return $this->redirectToRoute('appointment_index');
     }
+    #[Route('/appointment/request', name: 'appointment_request')]
+    /* ==========================
+     * PATIENT – REQUEST NEW
+     * ========================== */
+    public function request(
+        Request $request,
+        EntityManagerInterface $em,
+        UserRepository $userRepo
+    ): Response {
+        $appointment = new Appointment();
+        $form = $this->createForm(AppointmentType::class, $appointment);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $doctor = $userRepo->findOneBy(['email' => 'slimen.labyedh@chouflidoc.tn']);
+            $appointment->setPatient($this->getUser());
+            $appointment->setDoctor($doctor);
+            $appointment->setStatus(Appointment::APPOINTMENT_STATUS_PENDING);
+            $em->persist($appointment);
+            $em->flush();
+            $this->addFlash('success', 'Your appointment request has been sent successfully.');
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
+        return $this->render('appointment/request.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
     /* ==========================
      * Patient – CANCEL OWN
      * ========================== */

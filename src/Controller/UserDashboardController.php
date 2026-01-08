@@ -29,11 +29,17 @@ final class UserDashboardController extends AbstractController
             ->getResult();
         // Fetch medical records for the user
         $medicalRecords = $medicalRecordRepo->findBy(['patient' => $user], ['createdAt' => 'DESC']);
-
+        //show pending and accepted appointments 
+        $appointments = $appointmentRepo->findBy(
+            ['patient' => $this->getUser()],
+            ['dateAppointment' => 'ASC']
+        );
         // Render the dashboard template with fetched data
         return $this->render('user_dashboard/index.html.twig', [
             'appointments' => $appointments,
             'medicalRecords' => $medicalRecords,
         ]);
+            
+            
     }
 }

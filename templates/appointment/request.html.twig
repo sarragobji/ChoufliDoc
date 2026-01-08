@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2>Request an Appointment</h2>
+
+    {{ form_start(form) }}
+        {{ form_row(form.dateAppointment) }}
+        <button class="btn btn-primary">Request</button>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

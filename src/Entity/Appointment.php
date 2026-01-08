@@ -32,6 +32,19 @@ class Appointment
     public const APPOINTMENT_STATUS_PENDING = 'pending';
     public const APPOINTMENT_STATUS_CONFIRMED = 'accepted';
     public const APPOINTMENT_STATUS_CANCELLED = 'rejected';
+
+    #[ORM\Column(length: 20)]
+    private string $status = self::APPOINTMENT_STATUS_PENDING; // Default status
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
+        return $this;
+    }
     public function getIdAppointment(): ?int
     {
         return $this->idAppointment;
