@@ -45,7 +45,7 @@ security:
     # Note: Only the *first* matching rule is applied
     access_control:
          - { path: ^/admin, roles: ROLE_ADMIN }
-         - { path: ^/user-temp, roles: ROLE_USER } #TODO: replace user-temp by user after testing
+         - { path: ^/dashboard, roles: ROLE_USER } #TODO: replace user-temp by user after testing
 
 when@test:
     security:

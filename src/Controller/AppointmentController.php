@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -125,5 +126,30 @@ class AppointmentController extends AbstractController
         }
 
         return $this->redirectToRoute('appointment_index');
+    }
+    /* ==========================
+     * Patient – CANCEL OWN
+     * ========================== */
+    #[IsGranted('ROLE_USER')]
+    #[Route('/appointment/{id}/cancel', name: 'appointment_cancel', methods: ['POST'])]
+    public function cancel(
+        Appointment $appointment,
+        EntityManagerInterface $em,
+    ): RedirectResponse {
+        $user = $this->getUser();
+        if ($appointment->getPatient() !== $user) {
+            throw $this->createAccessDeniedException('You can only cancel your own appointments.');
+        }
+
+        if ($appointment->getDateAppointment() < new \DateTime()) {
+            $this->addFlash('error', 'You cannot cancel past or today\'s appointments.');
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
+        $em->remove($appointment);
+        $em->flush();
+        $this->addFlash('success', 'Appointment cancelled successfully.');
+
+        return $this->redirectToRoute('app_user_dashboard');
     }
 }

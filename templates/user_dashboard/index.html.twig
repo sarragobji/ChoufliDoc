@@ -1,0 +1,121 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Dashboard{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+
+    <!-- HOME + WELCOME -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Welcome {{ app.user.firstName }} {{ app.user.lastName }} 😊</h2>
+
+    <!-- Button group aligned to the right -->
+    <div class="d-flex">
+        <a href="{{ path('app_home') }}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-house"></i> Home
+        </a>
+
+        <a href="{{ path('app_logout') }}" class="btn btn-outline-danger">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+    </div>
+</div>
+
+
+    <!-- STATS CARDS -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Appointments</h5>
+                    <h2>{{ appointments|length }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Medical Records</h5>
+                    <h2>{{ medicalRecords|length }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPOINTMENTS -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            My Appointments
+        </div>
+        <div class="card-body">
+
+            {% if appointments is empty %}
+                <p class="text-muted">No upcoming appointments.</p>
+            {% else %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Doctor</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for appointment in appointments %}
+                        <tr>
+                            <td>{{ appointment.dateAppointment|date('d/m/Y') }}</td>
+                            <td>{{ appointment.doctor }}</td>
+                            <td class="text-end">
+                                <form method="post"
+                                      action="{{ path('appointment_cancel', {id: appointment.idAppointment}) }}"
+                                      onsubmit="return confirm('Cancel this appointment?');">
+                                    <button class="btn btn-sm btn-danger">
+                                        Cancel
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- MEDICAL RECORDS -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            My Medical Records
+        </div>
+        <div class="card-body">
+
+            {% if medicalRecords is empty %}
+                <p class="text-muted">No medical records available.</p>
+            {% else %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Reason</th>
+                            <th>Diagnosis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in medicalRecords %}
+                            <tr>
+                                <td>{{ record.createdAt|date('d/m/Y') }}</td>
+                                <td>{{ record.reason ?: '-' }}</td>
+                                <td>{{ record.diagnosis ?: 'Pending' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

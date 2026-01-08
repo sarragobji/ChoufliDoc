@@ -29,6 +29,9 @@ class Appointment
     #[ORM\JoinColumn(name: "doctor_id", referencedColumnName: "id_user", nullable: false)]
     private ?User $doctor = null;
 
+    public const APPOINTMENT_STATUS_PENDING = 'pending';
+    public const APPOINTMENT_STATUS_CONFIRMED = 'accepted';
+    public const APPOINTMENT_STATUS_CANCELLED = 'rejected';
     public function getIdAppointment(): ?int
     {
         return $this->idAppointment;

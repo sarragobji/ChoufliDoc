@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use Symfony\Component\ExpressionLanguage\Token;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -53,7 +54,7 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
         }
 
         return new RedirectResponse(
-            $this->urlGenerator->generate('app_home')
+            $this->urlGenerator->generate('app_user_dashboard') 
         );
     }
     protected function getLoginUrl(Request $request): string
