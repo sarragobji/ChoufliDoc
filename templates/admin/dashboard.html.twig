@@ -3,172 +3,168 @@
 {% block title %}Admin Dashboard - ChoufliDoc{% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800" rel="stylesheet">
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
-<body id="page-top">
-<!-- Page Wrapper -->
+<div id="page-top">
+
 <div id="wrapper">
 
-    <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <!-- SIDEBAR -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion">
 
-        <!-- Sidebar - Brand -->
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
-            <div class="sidebar-brand-text mx-3">Choufli DOC</div>
+        <a class="sidebar-brand d-flex align-items-center justify-content-center"
+           href="{{ path('admin') }}">
+            <div class="sidebar-brand-text mx-3">ChoufliDoc</div>
         </a>
 
         <hr class="sidebar-divider my-0">
 
-        <!-- Nav Item - Appointments -->
+        <li class="nav-item active">
+            <a class="nav-link" href="{{ path('admin') }}">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
         <li class="nav-item">
-            <a class="nav-link" href="#" id="appointmentsLink">
+            <a class="nav-link" href="{{ path('admin_appointment_index') }}">
+                <i class="fas fa-calendar"></i>
                 <span>Appointments</span>
             </a>
         </li>
 
-        <!-- Nav Item - Users -->
         <li class="nav-item">
-            <a class="nav-link" href="#" id="usersLink">
+            <a class="nav-link" href="{{ path('admin_user_index') }}">
+                <i class="fas fa-users"></i>
                 <span>Users</span>
             </a>
         </li>
 
+        <hr class="sidebar-divider">
     </ul>
-    <!-- End of Sidebar -->
+    <!-- END SIDEBAR -->
 
-    <!-- Content Wrapper -->
+    <!-- CONTENT WRAPPER -->
     <div id="content-wrapper" class="d-flex flex-column">
 
-        <!-- Main Content -->
+        <!-- MAIN CONTENT -->
         <div id="content">
 
-            <!-- Topbar -->
-            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                    <i class="fa fa-bars"></i>
-                </button>
+            <!-- TOPBAR -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 shadow">
 
-                <!-- Topbar Navbar -->
                 <ul class="navbar-nav ml-auto">
-
-                    <!-- User Information -->
                     <li class="nav-item dropdown no-arrow">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">Admin</span>
-                            <img class="img-profile rounded-circle" src="{{ asset('img/undraw_profile.svg') }}">
+                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                            <span class="mr-2 text-gray-600 small">
+                                {{ app.user.firstName }} {{ app.user.lastName }}
+                            </span>
+                            <img class="img-profile rounded-circle"
+                                 src="{{ asset('img/undraw_profile.svg') }}">
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                             aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="#"><i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>Profile</a>
-                            <a class="dropdown-item" href="#"><i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>Settings</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>Logout
+
+                        <div class="dropdown-menu dropdown-menu-right shadow">
+                            <a class="dropdown-item" href="{{ path('app_logout') }}">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i>
+                                Logout
                             </a>
                         </div>
                     </li>
-
                 </ul>
             </nav>
-            <!-- End of Topbar -->
+            <!-- END TOPBAR -->
 
-            <!-- Begin Page Content -->
+            <!-- PAGE CONTENT -->
             <div class="container-fluid">
-                <div id="dynamicContent" class="mt-4 text-center text-gray-600">
-                    <h3>Select an option from the sidebar</h3>
+
+                <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
+
+                <!-- STAT CARDS -->
+                <div class="row">
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Patients
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    {{ patientsCount|default(0) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Appointments
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    {{ appointmentsCount|default(0) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Medical Records
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    {{ recordsCount|default(0) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
-                {# Hidden templates for dynamic loading #}
-                <div id="appointmentsView" class="d-none">
-                    <div class="d-flex justify-content-between mb-3">
-                        <h4>Appointments</h4>
-                        <a href="" class="btn btn-primary">Add Appointment</a>
-                    </div>
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Patient</th>
-                                <th>Doctor</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                       
-                        </tbody>-->
-                    </table>
-                </div>
+                <!-- DOCTOR CALENDAR -->
+                {% if is_granted('ROLE_DOCTOR') %}
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                Appointment Calendar
+                            </h6>
 
-                <div id="usersView" class="d-none">
-                    <div class="d-flex justify-content-between mb-3">
-                        <h4>Users</h4>
-                        <a href="" class="btn btn-primary">Add User</a>
+                            <a href="{{ path('doctor_toggle_availability') }}"
+                               class="btn btn-sm btn-{{ app.user.isAvailable ? 'success' : 'danger' }}">
+                                {{ app.user.isAvailable ? 'Available' : 'Unavailable' }}
+                            </a>
+                        </div>
+
+                        <div class="card-body">
+                            <div id="calendar"></div>
+                        </div>
                     </div>
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th>Full Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Role</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                           
-                        </tbody>
-                    </table>
-                </div>
+                {% endif %}
 
             </div>
-            <!-- /.container-fluid -->
+            <!-- END PAGE CONTENT -->
 
         </div>
-        <!-- End of Main Content -->
+        <!-- END MAIN CONTENT -->
 
-        <!-- Footer -->
+        <!-- FOOTER -->
         <footer class="sticky-footer bg-white">
-            <div class="container my-auto text-center text-gray-600">
-                &copy; 2026 Choufli DOC
+            <div class="container my-auto text-center">
+                <span>© 2026 ChoufliDoc</span>
             </div>
         </footer>
-        <!-- End of Footer -->
 
     </div>
-    <!-- End of Content Wrapper -->
+    <!-- END CONTENT WRAPPER -->
 
 </div>
-<!-- End of Page Wrapper -->
-
-<!-- Scroll to Top Button-->
-<a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
-
-<!-- Logout Modal-->
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Ready to Leave?</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" href="login.html">Logout</a>
-            </div>
-        </div>
-    </div>
 </div>
-
 {% endblock %}
 
 {% block javascripts %}
@@ -177,20 +173,19 @@
     <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
 
-    <script>
-        // Dynamic content switching
-        const appointmentsLink = document.getElementById('appointmentsLink');
-        const usersLink = document.getElementById('usersLink');
-        const dynamicContent = document.getElementById('dynamicContent');
-
-        appointmentsLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            dynamicContent.innerHTML = document.getElementById('appointmentsView').innerHTML;
-        });
-
-        usersLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            dynamicContent.innerHTML = document.getElementById('usersView').innerHTML;
-        });
-    </script>
+    {% if is_granted('ROLE_DOCTOR') %}
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const calendar = new FullCalendar.Calendar(
+                    document.getElementById('calendar'),
+                    {
+                        initialView: 'dayGridMonth',
+                        events: '{{ path('doctor_calendar_events') }}'
+                    }
+                );
+                calendar.render();
+            });
+        </script>
+    {% endif %}
 {% endblock %}

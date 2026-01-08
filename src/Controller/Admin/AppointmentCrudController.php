@@ -10,6 +10,11 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField; 
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class AppointmentCrudController extends AbstractCrudController
 {
@@ -38,6 +43,49 @@ class AppointmentCrudController extends AbstractCrudController
             DateField::new('dateAppointment'),
             AssociationField::new('patient'),
             AssociationField::new('doctor')->setFormTypeOption('data', $doctor),
+            ChoiceField::new('status')->setChoices([
+                'Pending' => 'pending',
+                'Accepted' => 'accepted',
+                'Rejected' => 'rejected',
+            ]),
         ];
     }
+    public function configureActions(Actions $actions): Actions
+    {
+        $accept = Action::new('accept', 'Accept')
+        ->linkToCrudAction('acceptAppointment')
+        ->setCssClass('btn btn-success')
+        ->displayIf(fn ($entity) => $entity->getStatus() === 'pending');
+
+        $reject = Action::new('reject', 'Reject')
+            ->linkToCrudAction('rejectAppointment')
+            ->setCssClass('btn btn-danger')
+            ->displayIf(fn ($entity) => $entity->getStatus() === 'pending');
+
+        return $actions
+            ->add(Crud::PAGE_INDEX, $accept)
+            ->add(Crud::PAGE_INDEX, $reject);
+    }
+    public function acceptAppointment(AdminContext $context): RedirectResponse
+{
+        $appointment = $context->getEntity()->getInstance();
+
+        $appointment->setStatus('accepted');
+
+        $this->doctrine->getManager()->flush();
+
+        $this->addFlash('success', 'Appointment accepted');
+
+        return $this->redirect($context->getReferrer());
+}
+
+    public function rejectAppointment(AdminContext $context): RedirectResponse
+    {
+        $appointment = $context->getEntity()->getInstance();
+        $appointment->setStatus('rejected');
+        $this->doctrine->getManager()->flush();
+        $this->addFlash('danger', 'Appointment rejected');
+        return $this->redirect($context->getReferrer());
+    }
+
 }

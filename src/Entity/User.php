@@ -43,6 +43,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?string $password = null;
+    //Disponibility status for doctors only)
+    #[ORM\Column(type: 'boolean')]
+    private bool $isAvailable = true;
+    public function isAvailable(): bool
+    {
+        return $this->isAvailable;
+    }
+    public function setIsAvailable(bool $isAvailable): self
+    {
+        $this->isAvailable = $isAvailable;
+
+        return $this;
+    }
+
 
     // Plain password used only for forms (not persisted)
     private ?string $plainPassword = null;
