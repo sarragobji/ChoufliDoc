@@ -41,6 +41,21 @@
 /* =========================
    WELCOME HEADER
 ========================= */
+/* Hidden by default */
+.profile-section {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.5s ease, max-height 0.5s ease;
+}
+
+/* When visible */
+.profile-section.show {
+    opacity: 1;
+    max-height: 2000px; /* enough to show content */
+}
+
+
 .welcome-header {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     border-radius: 1.5rem;
