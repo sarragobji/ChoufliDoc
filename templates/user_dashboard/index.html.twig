@@ -1,129 +1,272 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}My Dashboard{% endblock %}
+{% block title %}My Dashboard - ChoufliDoc{% endblock %}
+
+{% block stylesheets %}
+    <link href="{{ asset('css/Dashboard_user.css') }}" rel="stylesheet">
+{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-
-    <!-- HOME + WELCOME -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Welcome {{ app.user.firstName }} {{ app.user.lastName }} 😊</h2>
-
-    <!-- Button group aligned to the right -->
-    <div class="d-flex">
-        <a href="{{ path('app_home') }}" class="btn btn-outline-primary me-2">
-            <i class="bi bi-house"></i> Home
-        </a>
-        <a href="{{ path('appointment_request') }}" class="btn btn-outline-primary">
-            <i class="bi bi-box-arrow-right"></i> Book Appointment
-        </a>
-        <a href="{{ path('app_logout') }}" class="btn btn-outline-danger">
-            <i class="bi bi-box-arrow-right"></i> Logout
-        </a>
-    </div>
-</div>
-
-
-    <!-- STATS CARDS -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Appointments</h5>
-                    <h2>{{ appointments|length }}</h2>
-                </div>
+<div class="dashboard-container">
+    <!-- Welcome Header Section -->
+    <div class="welcome-header">
+        <div class="welcome-content">
+            <div class="welcome-text">
+                <h1 class="welcome-title">
+                    <span class="greeting">Hello,</span>
+                    <span class="user-name">{{ app.user.firstName }} {{ app.user.lastName }}</span>
+                </h1>
+                <p class="welcome-subtitle">Welcome back to your health dashboard</p>
             </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Medical Records</h5>
-                    <h2>{{ medicalRecords|length }}</h2>
-                </div>
+            <div class="header-actions">
+                <a href="{{ path('app_home') }}" class="btn-action btn-home">
+                    <i class="bi bi-house-door-fill"></i>
+                    <span>Home</span>
+                </a>
+                <a href="{{ path('appointment_request') }}" class="btn-action btn-primary-action">
+                    <i class="bi bi-calendar-plus-fill"></i>
+                    <span>Book Appointment</span>
+                </a>
+                <a href="{{ path('app_logout') }}" class="btn-action btn-logout">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- APPOINTMENTS -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            My Appointments
-        </div>
-        <div class="card-body">
 
+    <!-- Stats Cards Section -->
+    <div class="stats-grid">
+        <div class="stat-card stat-card-primary" data-count="{{ appointments|length }}">
+            <div class="stat-card-icon">
+                <i class="bi bi-calendar-check-fill"></i>
+            </div>
+            <div class="stat-card-content">
+                <h3 class="stat-card-label">Total Appointments</h3>
+                <h2 class="stat-card-value" data-target="{{ appointments|length }}">0</h2>
+                <p class="stat-card-desc">Your scheduled appointments</p>
+            </div>
+            <div class="stat-card-decoration"></div>
+        </div>
+
+        <div class="stat-card stat-card-success" data-count="{{ medicalRecords|length }}">
+            <div class="stat-card-icon">
+                <i class="bi bi-file-earmark-medical-fill"></i>
+            </div>
+            <div class="stat-card-content">
+                <h3 class="stat-card-label">Medical Records</h3>
+                <h2 class="stat-card-value" data-target="{{ medicalRecords|length }}">0</h2>
+                <p class="stat-card-desc">Your health records</p>
+            </div>
+            <div class="stat-card-decoration"></div>
+        </div>
+    </div>
+
+    <!-- Appointments Section -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <div class="section-title-wrapper">
+                <div class="section-icon appointment-icon">
+                    <i class="bi bi-calendar-event-fill"></i>
+                </div>
+                <div>
+                    <h2 class="section-title">My Appointments</h2>
+                    <p class="section-subtitle">Manage your upcoming appointments</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
             {% if appointments is empty %}
-                <p class="text-muted">No upcoming appointments.</p>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="bi bi-calendar-x"></i>
+                    </div>
+                    <h3>No Appointments</h3>
+                    <p>You don't have any appointments scheduled yet.</p>
+                    <a href="{{ path('appointment_request') }}" class="btn btn-primary mt-3">
+                        <i class="bi bi-plus-circle"></i> Book Your First Appointment
+                    </a>
+                </div>
             {% else %}
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Doctor</th>
-                            <th>Status</th>
-                            <th class="text-end">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for appointment in appointments %}
-                        <tr>
-                            <td>{{ appointment.dateAppointment|date('d/m/Y') }}</td>
-                            <td>{{ appointment.doctor }}</td>
-                            <td>
-                                <span class="badge bg-{{ appointment.status == 'pending' ? 'warning' : 'success' }}">
-                                    {{ appointment.status|capitalize }}
-                                </span>
-                            </td>
-                            <td class="text-end">
-                                <form method="post"
-                                      action="{{ path('appointment_cancel', {id: appointment.idAppointment}) }}"
-                                      onsubmit="return confirm('Cancel this appointment?');">
-                                    <button class="btn btn-sm btn-danger">
-                                        Cancel
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            {% endif %}
-
-        </div>
-    </div>
-
-    <!-- MEDICAL RECORDS -->
-    <div class="card">
-        <div class="card-header bg-success text-white">
-            My Medical Records
-        </div>
-        <div class="card-body">
-
-            {% if medicalRecords is empty %}
-                <p class="text-muted">No medical records available.</p>
-            {% else %}
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Reason</th>
-                            <th>Diagnosis</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for record in medicalRecords %}
+                <div class="table-responsive">
+                    <table class="modern-table">
+                        <thead>
                             <tr>
-                                <td>{{ record.createdAt|date('d/m/Y') }}</td>
-                                <td>{{ record.reason ?: '-' }}</td>
-                                <td>{{ record.diagnosis ?: 'Pending' }}</td>
+                                <th><i class="bi bi-calendar3"></i> Date</th>
+                                <th><i class="bi bi-person-badge"></i> Doctor</th>
+                                <th><i class="bi bi-info-circle"></i> Status</th>
+                                <th class="text-end"><i class="bi bi-gear"></i> Actions</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for appointment in appointments %}
+                                <tr class="table-row-modern">
+                                    <td>
+                                        <div class="date-cell">
+                                            <span class="date-main">{{ appointment.dateAppointment|date('d M Y') }}</span>
+                                            <span class="date-sub">{{ appointment.dateAppointment|date('l') }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="doctor-cell">
+                                            <div class="doctor-avatar">
+                                                <i class="bi bi-person-circle"></i>
+                                            </div>
+                                            <span>{{ appointment.doctor }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-{{ appointment.status }}">
+                                            {% if appointment.status == 'pending' %}
+                                                <i class="bi bi-clock-history"></i>
+                                            {% elseif appointment.status == 'accepted' %}
+                                                <i class="bi bi-check-circle"></i>
+                                            {% else %}
+                                                <i class="bi bi-x-circle"></i>
+                                            {% endif %}
+                                            {{ appointment.status|capitalize }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        {% if appointment.status != 'rejected' %}
+                                            <form method="post" 
+                                                  action="{{ path('appointment_cancel', {id: appointment.idAppointment}) }}"
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+                                                <button type="submit" class="btn-action-icon btn-danger-icon" title="Cancel Appointment">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <span class="text-muted small">Cancelled</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% endif %}
-
         </div>
     </div>
 
+    <!-- Medical Records Section -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <div class="section-title-wrapper">
+                <div class="section-icon record-icon">
+                    <i class="bi bi-file-earmark-medical-fill"></i>
+                </div>
+                <div>
+                    <h2 class="section-title">My Medical Records</h2>
+                    <p class="section-subtitle">View your health history and records</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            {% if medicalRecords is empty %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="bi bi-file-earmark-medical"></i>
+                    </div>
+                    <h3>No Medical Records</h3>
+                    <p>Your medical records will appear here once available.</p>
+                </div>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-calendar3"></i> Date</th>
+                                <th><i class="bi bi-clipboard-pulse"></i> Reason</th>
+                                <th><i class="bi bi-heart-pulse"></i> Diagnosis</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in medicalRecords %}
+                                <tr class="table-row-modern">
+                                    <td>
+                                        <div class="date-cell">
+                                            <span class="date-main">{{ record.createdAt|date('d M Y') }}</span>
+                                            <span class="date-sub">{{ record.createdAt|date('H:i') }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="reason-cell">
+                                            {% if record.reason %}
+                                                {{ record.reason }}
+                                            {% else %}
+                                                <span class="text-muted">Not specified</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="diagnosis-cell">
+                                            {% if record.diagnosis %}
+                                                <span class="diagnosis-badge diagnosis-complete">
+                                                    <i class="bi bi-check-circle-fill"></i>
+                                                    {{ record.diagnosis|length > 50 ? record.diagnosis|slice(0, 50) ~ '...' : record.diagnosis }}
+                                                </span>
+                                            {% else %}
+                                                <span class="diagnosis-badge diagnosis-pending">
+                                                    <i class="bi bi-clock"></i>
+                                                    Pending
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    // Animate stat cards on load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Count up animation for stats
+        const statValues = document.querySelectorAll('.stat-card-value');
+        
+        const animateValue = (element, start, end, duration) => {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                element.textContent = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        };
+
+        statValues.forEach(stat => {
+            const target = parseInt(stat.getAttribute('data-target'));
+            if (target > 0) {
+                animateValue(stat, 0, target, 1000);
+            }
+        });
+
+        // Add fade-in animation to cards
+        const cards = document.querySelectorAll('.stat-card, .section-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
 {% endblock %}

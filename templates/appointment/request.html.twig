@@ -1,12 +1,39 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-<div class="container mt-4">
-    <h2>Request an Appointment</h2>
+{% block stylesheets %}
+    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800" rel="stylesheet">
+    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/appointment.css') }}" rel="stylesheet"> 
+{% endblock %}
 
-    {{ form_start(form) }}
-        {{ form_row(form.dateAppointment) }}
-        <button class="btn btn-primary">Request</button>
-    {{ form_end(form) }}
+{% block body %}
+<div class="container mt-5">
+    <div class="card shadow-sm p-5 mx-auto appointment-card">
+        <div class="card-header text-center bg-primary text-white">
+            <h2 class="mb-0">Request an Appointment</h2>
+        </div>
+
+        <div class="card-body">
+            {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+                <div class="mb-4">
+                    {{ form_label(form.dateAppointment, 'Choose a Date', {'label_attr': {'class': 'form-label fs-5'}}) }}
+                    {{ form_widget(form.dateAppointment, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                    {{ form_errors(form.dateAppointment) }}
+                </div>
+
+                <button class="btn btn-primary btn-lg w-100 mb-3">
+                    <i class="fas fa-calendar-check me-2"></i> Request
+                </button>
+            {{ form_end(form) }}
+
+            {# Back to Dashboard link #}
+            <div class="text-center">
+                <a href="{{ path('app_user_dashboard') }}" class="btn btn-link">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

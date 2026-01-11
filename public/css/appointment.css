@@ -1,0 +1,49 @@
+/* Center the card */
+body{
+     background: url("../images/background.png") center/cover no-repeat;
+}
+.appointment-card {
+    max-width: 500px;
+    border-radius: 15px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    background-color: #ffffff;
+}
+
+/* Hover effect for subtle interactivity */
+.appointment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Button style */
+.appointment-card .btn-primary {
+    background: linear-gradient(90deg, #667eea ,#9869c6);
+    border: none;
+    font-weight: 600;
+    padding: 10px 0;
+    font-size: 16px;
+    border-radius: 8px;
+}
+
+.appointment-card .btn-primary:hover {
+    background: linear-gradient(90deg, #9869c6, #748fe1);
+}
+
+/* Input focus effect */
+.appointment-card .form-control:focus {
+    border-color: #1cc88a;
+    box-shadow: 0 0 0 0.2rem rgba(28, 200, 138, 0.25);
+}
+
+/* Card header style */
+.appointment-card .card-header {
+    border-bottom: none;
+    border-radius: 15px 15px 0 0;
+}
+
+/* Responsive tweaks */
+@media (max-width: 576px) {
+    .appointment-card {
+        margin: 20px;
+    }
+}
