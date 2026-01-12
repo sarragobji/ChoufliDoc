@@ -115,16 +115,14 @@ body {
     display: flex;
     align-items: center;
     overflow: hidden;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    transform: translateZ(0);
-    will-change: transform;
+    background: none;
 }
 
 .hero-background {
     position: absolute;
     inset: 0;
     background: url("../images/background.png") center/cover no-repeat;
-    opacity: 0.3;
+    opacity: 1;
     z-index: 0;
     will-change: transform;
 }
@@ -133,10 +131,9 @@ body {
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: var(--gradient-overlay);
+    background: rgba(0, 0, 0, 0.45); 
     z-index: 1;
 }
-
 .hero-section .container {
     position: relative;
     z-index: 2;
@@ -205,26 +202,23 @@ body {
 }
 
 .profile-circle {
-    width: 400px;
-    height: 400px;
+    width: 500px;
+    height: 600px;
     position: relative;
+    overflow: hidden;
     animation: float 6s ease-in-out infinite;
 }
 
 .profile-ring {
     position: absolute;
     inset: -20px;
-    border: 3px solid rgba(255,255,255,0.3);
-    border-radius: 50%;
     animation: pulse 2s ease-in-out infinite;
 }
 
 .profile-img {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
     object-fit: cover;
-    border: 10px solid rgba(255,255,255,0.2);
     box-shadow: var(--shadow-lg);
 }
 
@@ -304,28 +298,27 @@ body {
 }
 .about-image-container {
     position: relative;
-    overflow: hidden;
-    border-radius: 1rem;
+    overflow: visible;  /* ✅ allow image to move slightly */
+    border-radius: 1rem; /* optional */
 }
 
 .about-image-container img {
+    width: 100%;
+    height: auto;
+    display: block;
     transition: transform 0.5s;
 }
 
 .about-image-container:hover img {
-    transform: scale(1.05) rotate(1deg);
+    transform: scale(1.05); /* optional: remove rotate if it cuts off */
 }
 
-.image-decoration {
-    position: absolute;
-    bottom: -10px;
-    right: -10px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: rgba(13, 110, 253, 0.3);
-    animation: float 3s ease-in-out infinite;
+.about-image-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
 
 @keyframes float {
     0%, 100% { transform: translateY(0); }
