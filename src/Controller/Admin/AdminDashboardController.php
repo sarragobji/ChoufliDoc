@@ -35,12 +35,12 @@ class AdminDashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
+        //yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
+        yield MenuItem::linkToRoute('Doctor Dashboard', 'fa fa-user-md', 'doctor_dashboard')
+            ->setPermission('ROLE_DOCTOR');
         yield MenuItem::section('Management');
         yield MenuItem::linkToCrud('Manage Appointments', 'fa fa-calendar', Appointment::class);
         yield MenuItem::linkToCrud('Manage Users', 'fa fa-users', User::class);
         yield MenuItem::linkToCrud('Manage Medical Records', 'fa fa-file-medical', MedicalRecord::class);
-        yield MenuItem::linkToRoute('Doctor Calendars', 'fa fa-calendar-check', 'doctor_calendars')
-        ->setPermission('ROLE_Doctor');
     }
 }

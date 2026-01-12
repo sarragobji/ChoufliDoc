@@ -1,0 +1,323 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Doctor Dashboard - ChoufliDoc{% endblock %}
+
+{% block stylesheets %}
+    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800" rel="stylesheet">
+    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <style>
+        .appointment-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .appointment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-accepted {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div id="page-top">
+<div id="wrapper">
+
+    <!-- SIDEBAR -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ path('admin') }}">
+            <div class="sidebar-brand-text mx-3">ChoufliDoc</div>
+        </a>
+
+        <hr class="sidebar-divider my-0">
+
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path('admin') }}">
+                <i class="fas fa-home"></i>
+                <span>Admin Dashboard</span>
+            </a>
+        </li>
+
+        <li class="nav-item active">
+            <a class="nav-link" href="{{ path('doctor_dashboard') }}">
+                <i class="fas fa-user-md"></i>
+                <span>Doctor Dashboard</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path('doctor_calendar') }}">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Calendar</span>
+            </a>
+        </li>
+
+        <hr class="sidebar-divider">
+    </ul>
+    <!-- END SIDEBAR -->
+
+    <!-- CONTENT WRAPPER -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- MAIN CONTENT -->
+        <div id="content">
+
+            <!-- TOPBAR -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 shadow">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                            <span class="mr-2 text-gray-600 small">
+                                Dr. {{ app.user.firstName }} {{ app.user.lastName }}
+                            </span>
+                            <img class="img-profile rounded-circle" src="{{ asset('img/undraw_profile.svg') }}">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow">
+                            <a class="dropdown-item" href="{{ path('app_logout') }}">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <!-- END TOPBAR -->
+
+            <!-- PAGE CONTENT -->
+            <div class="container-fluid">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 text-gray-800">
+                        <i class="fas fa-user-md mr-2"></i>Doctor Dashboard
+                    </h1>
+                    <div>
+                        <a href="{{ path('doctor_calendar') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-calendar-alt mr-1"></i>View Calendar
+                        </a>
+                        <a href="{{ path('doctor_toggle_availability') }}" 
+                           class="btn btn-sm btn-{{ app.user.isAvailable ? 'success' : 'danger' }}">
+                            <i class="fas fa-{{ app.user.isAvailable ? 'check' : 'times' }} mr-1"></i>
+                            {{ app.user.isAvailable ? 'Available' : 'Unavailable' }}
+                        </a>
+                    </div>
+                </div>
+
+                <!-- FLASH MESSAGES -->
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+                <!-- STAT CARDS -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Total Appointments
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            {{ totalAppointments }}
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Pending
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            {{ pendingAppointments|length }}
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Accepted
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            {{ acceptedAppointments|length }}
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-danger shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                            Rejected
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            {{ rejectedAppointments|length }}
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- APPOINTMENTS TABLE -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-calendar-alt mr-2"></i>My Appointments
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% if appointments|length > 0 %}
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Date & Time</th>
+                                            <th>Patient</th>
+                                            <th>Patient Email</th>
+                                            <th>Patient Phone</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for appointment in appointments %}
+                                            <tr>
+                                                <td>
+                                                    <strong>{{ appointment.dateAppointment|date('F d, Y') }}</strong><br>
+                                                    <small class="text-muted">{{ appointment.dateAppointment|date('l, g:i A') }}</small>
+                                                </td>
+                                                <td>
+                                                    <i class="fas fa-user mr-2"></i>
+                                                    {{ appointment.patient.firstName }} {{ appointment.patient.lastName }}
+                                                </td>
+                                                <td>
+                                                    <i class="fas fa-envelope mr-2"></i>
+                                                    {{ appointment.patient.email }}
+                                                </td>
+                                                <td>
+                                                    <i class="fas fa-phone mr-2"></i>
+                                                    {{ appointment.patient.phoneNumber|default('N/A') }}
+                                                </td>
+                                                <td>
+                                                    <span class="status-badge status-{{ appointment.status }}">
+                                                        {% if appointment.status == 'pending' %}
+                                                            <i class="fas fa-clock mr-1"></i>
+                                                        {% elseif appointment.status == 'accepted' %}
+                                                            <i class="fas fa-check-circle mr-1"></i>
+                                                        {% else %}
+                                                            <i class="fas fa-times-circle mr-1"></i>
+                                                        {% endif %}
+                                                        {{ appointment.status|capitalize }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    {% if appointment.status == 'pending' %}
+                                                        <a href="{{ path('doctor_appointment_accept', {'id': appointment.idAppointment}) }}" 
+                                                           class="btn btn-sm btn-success mr-1"
+                                                           onclick="return confirm('Are you sure you want to accept this appointment?');">
+                                                            <i class="fas fa-check"></i> Accept
+                                                        </a>
+                                                        <a href="{{ path('doctor_appointment_reject', {'id': appointment.idAppointment}) }}" 
+                                                           class="btn btn-sm btn-danger"
+                                                           onclick="return confirm('Are you sure you want to reject this appointment?');">
+                                                            <i class="fas fa-times"></i> Reject
+                                                        </a>
+                                                    {% else %}
+                                                        <span class="text-muted">No actions available</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-calendar-times fa-3x text-gray-300 mb-3"></i>
+                                <p class="text-gray-500">No appointments found.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+            <!-- END PAGE CONTENT -->
+
+        </div>
+        <!-- END MAIN CONTENT -->
+
+        <!-- FOOTER -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto text-center">
+                <span>© 2026 ChoufliDoc - Doctor Dashboard</span>
+            </div>
+        </footer>
+
+    </div>
+    <!-- END CONTENT WRAPPER -->
+
+</div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+    <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Doctor Calendar - ChoufliDoc{% endblock %}
+
+{% block stylesheets %}
+    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800" rel="stylesheet">
+    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.css" rel="stylesheet">
+    <style>
+        .fc-event {
+            cursor: pointer;
+        }
+        .status-pending { background-color: #ffc107; border-color: #ffc107; }
+        .status-accepted { background-color: #28a745; border-color: #28a745; }
+        .status-rejected { background-color: #dc3545; border-color: #dc3545; }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div id="page-top">
+<div id="wrapper">
+
+    <!-- SIDEBAR -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ path('admin') }}">
+            <div class="sidebar-brand-text mx-3">ChoufliDoc</div>
+        </a>
+
+        <hr class="sidebar-divider my-0">
+
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path('admin') }}">
+                <i class="fas fa-home"></i>
+                <span>Admin Dashboard</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path('doctor_dashboard') }}">
+                <i class="fas fa-user-md"></i>
+                <span>Doctor Dashboard</span>
+            </a>
+        </li>
+
+        <li class="nav-item active">
+            <a class="nav-link" href="{{ path('doctor_calendar') }}">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Calendar</span>
+            </a>
+        </li>
+
+        <hr class="sidebar-divider">
+    </ul>
+    <!-- END SIDEBAR -->
+
+    <!-- CONTENT WRAPPER -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- MAIN CONTENT -->
+        <div id="content">
+
+            <!-- TOPBAR -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 shadow">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                            <span class="mr-2 text-gray-600 small">
+                                Dr. {{ app.user.firstName }} {{ app.user.lastName }}
+                            </span>
+                            <img class="img-profile rounded-circle" src="{{ asset('img/undraw_profile.svg') }}">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow">
+                            <a class="dropdown-item" href="{{ path('app_logout') }}">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <!-- END TOPBAR -->
+
+            <!-- PAGE CONTENT -->
+            <div class="container-fluid">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 text-gray-800">
+                        <i class="fas fa-calendar-alt mr-2"></i>Appointment Calendar
+                    </h1>
+                    <a href="{{ path('doctor_toggle_availability') }}" 
+                       class="btn btn-sm btn-{{ app.user.isAvailable ? 'success' : 'danger' }}">
+                        <i class="fas fa-{{ app.user.isAvailable ? 'check' : 'times' }} mr-1"></i>
+                        {{ app.user.isAvailable ? 'Available' : 'Unavailable' }}
+                    </a>
+                </div>
+
+                <!-- FLASH MESSAGES -->
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+                <!-- CALENDAR -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-calendar-check mr-2"></i>My Appointments Calendar
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="calendar" style="min-height: 600px;"></div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- END PAGE CONTENT -->
+
+        </div>
+        <!-- END MAIN CONTENT -->
+
+        <!-- FOOTER -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto text-center">
+                <span>© 2026 ChoufliDoc - Doctor Calendar</span>
+            </div>
+        </footer>
+
+    </div>
+    <!-- END CONTENT WRAPPER -->
+
+</div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+    <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+            
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 'auto',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: {
+                    url: '{{ path('doctor_calendar_events') }}',
+                    method: 'GET',
+                    failure: function() {
+                        alert('Failed to load calendar events.');
+                    }
+                },
+                eventClick: function(info) {
+                    alert('Appointment: ' + info.event.title + '\nDate: ' + info.event.start.toLocaleString());
+                },
+                eventDidMount: function(info) {
+                    // Color code events by status
+                    const status = info.event.extendedProps.status;
+                    if (status === 'pending') {
+                        info.el.style.backgroundColor = '#ffc107';
+                        info.el.style.borderColor = '#ffc107';
+                    } else if (status === 'accepted') {
+                        info.el.style.backgroundColor = '#28a745';
+                        info.el.style.borderColor = '#28a745';
+                    } else if (status === 'rejected') {
+                        info.el.style.backgroundColor = '#dc3545';
+                        info.el.style.borderColor = '#dc3545';
+                    }
+                }
+            });
+            
+            calendar.render();
+        });
+    </script>
+{% endblock %}

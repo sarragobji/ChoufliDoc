@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Appointment;
 use App\Entity\User;
+use App\Repository\AppointmentRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -13,8 +14,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Attribute\Route;
+use Doctrine\ORM\EntityManagerInterface;
 
 class AppointmentCrudController extends AbstractCrudController
 {
@@ -53,12 +55,16 @@ class AppointmentCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         $accept = Action::new('accept', 'Accept')
-        ->linkToCrudAction('acceptAppointment')
-        ->setCssClass('btn btn-success')
-        ->displayIf(fn ($entity) => $entity->getStatus() === 'pending');
+            ->linkToRoute('admin_appointment_accept', function ($entity) {
+                return ['id' => $entity->getIdAppointment()];
+            })
+            ->setCssClass('btn btn-success')
+            ->displayIf(fn ($entity) => $entity->getStatus() === 'pending');
 
         $reject = Action::new('reject', 'Reject')
-            ->linkToCrudAction('rejectAppointment')
+            ->linkToRoute('admin_appointment_reject', function ($entity) {
+                return ['id' => $entity->getIdAppointment()];
+            })
             ->setCssClass('btn btn-danger')
             ->displayIf(fn ($entity) => $entity->getStatus() === 'pending');
 
@@ -66,26 +72,41 @@ class AppointmentCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, $accept)
             ->add(Crud::PAGE_INDEX, $reject);
     }
-    public function acceptAppointment(AdminContext $context): RedirectResponse
-{
-        $appointment = $context->getEntity()->getInstance();
+
+    #[Route('/admin/appointment/{id}/accept', name: 'admin_appointment_accept')]
+    public function acceptAppointment(int $id, AppointmentRepository $appointmentRepository, EntityManagerInterface $em): RedirectResponse
+    {
+        $appointment = $appointmentRepository->find($id);
+        
+        if (!$appointment) {
+            $this->addFlash('danger', 'Appointment not found.');
+            return $this->redirect($this->generateUrl('admin_appointment_index'));
+        }
 
         $appointment->setStatus('accepted');
+        $em->flush();
 
-        $this->doctrine->getManager()->flush();
+        $this->addFlash('success', 'Appointment accepted successfully.');
 
-        $this->addFlash('success', 'Appointment accepted');
+        return $this->redirect($this->generateUrl('admin_appointment_index'));
+    }
 
-        return $this->redirect($context->getReferrer());
-}
-
-    public function rejectAppointment(AdminContext $context): RedirectResponse
+    #[Route('/admin/appointment/{id}/reject', name: 'admin_appointment_reject')]
+    public function rejectAppointment(int $id, AppointmentRepository $appointmentRepository, EntityManagerInterface $em): RedirectResponse
     {
-        $appointment = $context->getEntity()->getInstance();
+        $appointment = $appointmentRepository->find($id);
+        
+        if (!$appointment) {
+            $this->addFlash('danger', 'Appointment not found.');
+            return $this->redirect($this->generateUrl('admin_appointment_index'));
+        }
+
         $appointment->setStatus('rejected');
-        $this->doctrine->getManager()->flush();
-        $this->addFlash('danger', 'Appointment rejected');
-        return $this->redirect($context->getReferrer());
+        $em->flush();
+
+        $this->addFlash('danger', 'Appointment rejected.');
+
+        return $this->redirect($this->generateUrl('admin_appointment_index'));
     }
 
 }
