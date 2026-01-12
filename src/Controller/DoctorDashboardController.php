@@ -9,11 +9,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\AppointmentRepository;
 use App\Entity\User;
+use App\Service\AppointmentNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 
 #[IsGranted('ROLE_DOCTOR')]
 class DoctorDashboardController extends AbstractController
 {
+    public function __construct(
+        private AppointmentNotificationService $notificationService
+    ) {
+    }
     #[Route('/doctor/dashboard', name: 'doctor_dashboard')]
     public function index(AppointmentRepository $appointmentRepository)
     {
@@ -118,7 +123,14 @@ class DoctorDashboardController extends AbstractController
         $appointment->setStatus('accepted');
         $em->flush();
 
-        $this->addFlash('success', 'Appointment accepted successfully.');
+        // Send email notification
+        try {
+            $this->notificationService->sendAppointmentAcceptedNotification($appointment);
+        } catch (\Exception $e) {
+            error_log('Failed to send appointment acceptance email: ' . $e->getMessage());
+        }
+
+        $this->addFlash('success', 'Appointment accepted successfully. Email notification sent.');
 
         return $this->redirectToRoute('doctor_dashboard');
     }
@@ -135,7 +147,14 @@ class DoctorDashboardController extends AbstractController
         $appointment->setStatus('rejected');
         $em->flush();
 
-        $this->addFlash('danger', 'Appointment rejected.');
+        // Send email notification
+        try {
+            $this->notificationService->sendAppointmentRejectedNotification($appointment);
+        } catch (\Exception $e) {
+            error_log('Failed to send appointment rejection email: ' . $e->getMessage());
+        }
+
+        $this->addFlash('danger', 'Appointment rejected. Email notification sent.');
 
         return $this->redirectToRoute('doctor_dashboard');
     }

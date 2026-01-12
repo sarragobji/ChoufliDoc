@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Appointment;
 use App\Entity\User;
 use App\Repository\AppointmentRepository;
+use App\Service\AppointmentNotificationService;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -22,8 +23,10 @@ class AppointmentCrudController extends AbstractCrudController
 {
     private ManagerRegistry $doctrine;
 
-    public function __construct(ManagerRegistry $doctrine)
-    {
+    public function __construct(
+        ManagerRegistry $doctrine,
+        private AppointmentNotificationService $notificationService
+    ) {
         $this->doctrine = $doctrine;
     }
 
@@ -86,7 +89,15 @@ class AppointmentCrudController extends AbstractCrudController
         $appointment->setStatus('accepted');
         $em->flush();
 
-        $this->addFlash('success', 'Appointment accepted successfully.');
+        // Send email notification
+        try {
+            $this->notificationService->sendAppointmentAcceptedNotification($appointment);
+        } catch (\Exception $e) {
+            // Log error but don't fail the request
+            error_log('Failed to send appointment acceptance email: ' . $e->getMessage());
+        }
+
+        $this->addFlash('success', 'Appointment accepted successfully. Email notification sent.');
 
         return $this->redirect($this->generateUrl('admin_appointment_index'));
     }
@@ -104,7 +115,15 @@ class AppointmentCrudController extends AbstractCrudController
         $appointment->setStatus('rejected');
         $em->flush();
 
-        $this->addFlash('danger', 'Appointment rejected.');
+        // Send email notification
+        try {
+            $this->notificationService->sendAppointmentRejectedNotification($appointment);
+        } catch (\Exception $e) {
+            // Log error but don't fail the request
+            error_log('Failed to send appointment rejection email: ' . $e->getMessage());
+        }
+
+        $this->addFlash('danger', 'Appointment rejected. Email notification sent.');
 
         return $this->redirect($this->generateUrl('admin_appointment_index'));
     }
