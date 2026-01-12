@@ -1,103 +1,134 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Login - ChoufliDoc{% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
+<link href="{{ asset('css/login.css') }}" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
 <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
-        <div class="container px-5">
-            <a class="navbar-brand" href="{{ path('app_home') }}">
-                <span class="fw-bolder text-primary">Choufli DOC</span>
-            </a>
+<nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+    <div class="container px-5">
+        <a class="navbar-brand" href="{{ path('app_home') }}">
+            <span class="fw-bolder text-primary"><i class="fas fa-heartbeat me-2"></i>Choufli DOC</span>
+        </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 small fw-bolder">
-                    <li class="nav-item"><a class="nav-link" href="{{ path('app_home') }}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">Login</a></li>
-                    <li class="nav-item"><a class="nav-link" href="">About</a></li>
-                </ul>
-            </div>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 fw-semibold">
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_home') }}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                <li class="nav-item"><a class="nav-link btn-login" href="{{ path('app_login') }}">Login</a></li>
+            </ul>
         </div>
-    </nav>
-<div class="bg-gradient-primary vh-100">
+    </div>
+</nav>
+
+<!-- Login Section -->
+<section class="login-section">
+    <div class="login-background"></div>
+    <div class="login-overlay"></div>
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-xl-10 col-lg-12 col-md-9">
-                <div class="card o-hidden border-0 shadow-lg my-5">
-                    <div class="card-body p-0">
-                        <div class="row">
-    {# Form on the LEFT #}
-    <div class="col-lg-7">
-        <div class="p-5">
-            <div class="text-center">
-                <h1 class="h4 text-gray-900 mb-4">Welcome back !</h1>
-            </div>
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-xl-10 col-lg-12">
+                <div class="login-card">
+                    <div class="row g-0">
+                        {# Form on the LEFT #}
+                        <div class="col-lg-7">
+                            <div class="login-form-wrapper">
+                                <div class="text-center mb-4">
+                                    <h1 class="login-title">Welcome Back!</h1>
+                                    <p class="login-subtitle">Sign in to continue to your account</p>
+                                </div>
 
-            <form class="user" method="post">
-                {% if error %}
-                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-                {% endif %}
+                                <form method="post" class="login-form">
+                                    {% if error %}
+                                        <div class="alert alert-danger" role="alert">
+                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                                        </div>
+                                    {% endif %}
 
-                <div class="form-group">
-                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" 
-                           class="form-control form-control-user" 
-                           placeholder="Enter Email Address..." autocomplete="email" required autofocus>
-                </div>
-                <div class="form-group">
-                    <input type="password" name="password" id="inputPassword" 
-                           class="form-control form-control-user" 
-                           placeholder="Password" autocomplete="current-password" required>
-                </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="email" value="{{ last_username }}" name="email" id="inputEmail" 
+                                               class="form-control" 
+                                               placeholder="Email Address" autocomplete="email" required autofocus>
+                                        <label for="inputEmail"><i class="fas fa-envelope me-2"></i>Email Address</label>
+                                    </div>
 
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                                    <div class="form-floating mb-3">
+                                        <input type="password" name="password" id="inputPassword" 
+                                               class="form-control" 
+                                               placeholder="Password" autocomplete="current-password" required>
+                                        <label for="inputPassword"><i class="fas fa-lock me-2"></i>Password</label>
+                                    </div>
 
-                <div class="form-group">
-                    <div class="custom-control custom-checkbox small">
-                        <input type="checkbox" class="custom-control-input" id="customCheck" name="_remember_me">
-                        <label class="custom-control-label" for="customCheck">Remember Me</label>
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                                    <div class="form-check mb-4">
+                                        <input type="checkbox" class="form-check-input" id="rememberMe" name="_remember_me">
+                                        <label class="form-check-label" for="rememberMe">
+                                            Remember Me
+                                        </label>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary btn-login-submit w-100 mb-3">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                                    </button>
+                                </form>
+
+                                <div class="text-center mt-4">
+                                    <a href="#" class="text-link">Forgot Password?</a>
+                                </div>
+                                
+                                <hr class="my-4">
+                                
+                                <div class="text-center">
+                                    <p class="mb-0 text-muted">Don't have an account?</p>
+                                    <a href="{{ path('app_register') }}" class="btn btn-outline-primary mt-2">
+                                        <i class="fas fa-user-plus me-2"></i>Create Account
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Image on the RIGHT #}
+                        <div class="col-lg-5 d-none d-lg-block login-image-col">
+                            <div class="login-image-wrapper">
+                                <img src="{{ asset('images/login.jpg') }}" class="login-image" alt="Login">
+                                <div class="image-overlay-text">
+                                    <h3>Your Health Journey Starts Here</h3>
+                                    <p>Access your personalized healthcare dashboard</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <button type="submit" class="btn btn-primary btn-user btn-block">
-                    Login
-                </button>
-            </form>
-
-            <hr>
-            <div class="text-center">
-                <a class="small" href="#">Forgot Password?</a>
-            </div>
-            <div class="text-center">
-                <a class="small" href="{{ path('app_register') }}">Create an Account!</a>
             </div>
         </div>
     </div>
-
-    {# Image on the RIGHT #}
-    <div class="col-lg-5 d-none d-lg-block p-0">
-        <img src="{{ asset('images/dalindaa.png') }}" class="img-fluid w-100 h-100" >
-    </div>
-</div>
-
-        </div>
-    </div>
-</div>
+</section>
 {% endblock %}
 
 {% block javascripts %}
-    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
-    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
-    <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Navbar scroll effect
+    const navbar = document.getElementById('mainNav');
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+});
+</script>
 {% endblock %}
