@@ -1,0 +1,339 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Profile - ChoufliDoc{% endblock %}
+
+{% block stylesheets %}
+    <link href="{{ asset('css/Dashboard_user.css') }}" rel="stylesheet">
+    <style>
+        .profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 3rem;
+            color: white;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        .profile-picture-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+        .profile-picture:hover {
+            transform: scale(1.05);
+        }
+        .profile-picture-placeholder {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 5px solid white;
+            font-size: 4rem;
+            color: white;
+        }
+        .profile-info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .profile-info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 120px;
+        }
+        .info-value {
+            color: #6c757d;
+            flex: 1;
+        }
+        .theme-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+        [data-theme="dark"] {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --text-primary: #eaeaea;
+            --text-secondary: #b8b8b8;
+            --card-bg: #0f3460;
+            --border-color: #2a2a3e;
+        }
+        [data-theme="dark"] .profile-info-card {
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+        [data-theme="dark"] .info-label {
+            color: var(--text-primary);
+        }
+        [data-theme="dark"] .info-value {
+            color: var(--text-secondary);
+        }
+        [data-theme="dark"] .info-item {
+            border-bottom-color: var(--border-color);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="profile-container">
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" title="Toggle Dark/Light Mode">
+        <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+    </button>
+
+    <!-- Navigation -->
+    <div class="mb-4">
+        <a href="{{ path('app_user_dashboard') }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Profile Header -->
+    <div class="profile-header text-center">
+        <div class="profile-picture-container">
+            {% if user.profilePicture %}
+                <img src="{{ asset(user.profilePicture) }}" alt="Profile Picture" class="profile-picture">
+            {% else %}
+                <div class="profile-picture-placeholder">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+            {% endif %}
+        </div>
+        <h1 class="mb-2">{{ user.firstName }} {{ user.lastName }}</h1>
+        <p class="mb-0 opacity-75">{{ user.email }}</p>
+    </div>
+
+    <!-- Flash Messages -->
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <!-- Edit Profile Form -->
+    <div class="profile-info-card">
+        <h3 class="mb-4">
+            <i class="bi bi-pencil-square me-2"></i>Edit Profile
+        </h3>
+        
+        {{ form_start(profileForm, {'attr': {'enctype': 'multipart/form-data', 'class': 'profile-form'}}) }}
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form_label(profileForm.firstName) }}
+                    {{ form_widget(profileForm.firstName, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(profileForm.firstName) }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form_label(profileForm.lastName) }}
+                    {{ form_widget(profileForm.lastName, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(profileForm.lastName) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form_label(profileForm.email) }}
+                    {{ form_widget(profileForm.email, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(profileForm.email) }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form_label(profileForm.phoneNumber) }}
+                    {{ form_widget(profileForm.phoneNumber, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(profileForm.phoneNumber) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(profileForm.address) }}
+            {{ form_widget(profileForm.address, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(profileForm.address) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(profileForm.birthDate) }}
+            {{ form_widget(profileForm.birthDate, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(profileForm.birthDate) }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Profile Picture</label>
+            {% if user.profilePicture %}
+                <div class="mb-2">
+                    <img src="{{ asset(user.profilePicture) }}" alt="Current Profile Picture" 
+                         style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #dee2e6;">
+                </div>
+            {% endif %}
+            {{ form_widget(profileForm.profilePicture, {'attr': {'class': 'form-control'}}) }}
+            <small class="form-text text-muted">Upload a new profile picture (max 5MB, JPEG/PNG/GIF/WebP)</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-save me-2"></i>Save Changes
+        </button>
+
+        {{ form_end(profileForm) }}
+    </div>
+
+    <!-- Profile Information Display -->
+    <div class="profile-info-card">
+        <h3 class="mb-4">
+            <i class="bi bi-info-circle me-2"></i>Profile Information
+        </h3>
+        
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="bi bi-person"></i>
+            </div>
+            <div class="info-label">Full Name</div>
+            <div class="info-value">{{ user.firstName }} {{ user.lastName }}</div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="bi bi-envelope"></i>
+            </div>
+            <div class="info-label">Email</div>
+            <div class="info-value">{{ user.email }}</div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="bi bi-telephone"></i>
+            </div>
+            <div class="info-label">Phone</div>
+            <div class="info-value">{{ user.phoneNumber|default('Not provided') }}</div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="bi bi-calendar"></i>
+            </div>
+            <div class="info-label">Birth Date</div>
+            <div class="info-value">{{ user.birthDate ? user.birthDate|date('F d, Y') : 'Not provided' }}</div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="bi bi-geo-alt"></i>
+            </div>
+            <div class="info-label">Address</div>
+            <div class="info-value">{{ user.address|default('Not provided') }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = html.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+        if (theme === 'dark') {
+            themeIcon.className = 'bi bi-sun-fill';
+        } else {
+            themeIcon.className = 'bi bi-moon-stars-fill';
+        }
+    }
+</script>
+{% endblock %}

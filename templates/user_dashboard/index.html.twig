@@ -4,13 +4,45 @@
 
 {% block stylesheets %}
     <link href="{{ asset('css/Dashboard_user.css') }}" rel="stylesheet">
+    <style>
+        [data-theme="dark"] {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --text-primary: #eaeaea;
+            --text-secondary: #b8b8b8;
+            --card-bg: #0f3460;
+            --border-color: #2a2a3e;
+        }
+        [data-theme="dark"] .dashboard-container {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        [data-theme="dark"] .welcome-header {
+            background: var(--bg-secondary);
+        }
+        [data-theme="dark"] .section-card {
+            background: var(--card-bg);
+            border-color: var(--border-color);
+        }
+        [data-theme="dark"] .stat-card {
+            background: var(--card-bg);
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
 <div class="dashboard-container">
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" title="Toggle Dark/Light Mode" style="position: fixed; bottom: 2rem; right: 2rem; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; font-size: 1.5rem; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.3s ease; z-index: 1000;">
+        <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+    </button>
+
     <!-- Welcome Header Section -->
     <div class="welcome-header">
-    <a href="#" id="toggleProfile" class="btn btn-primary">
+    <a href="{{ path('app_user_profile') }}" class="btn btn-primary">
     <i class="bi bi-person-circle me-1"></i> View Profile
 </a>
 <!-- Edit Profile Modal -->
@@ -316,16 +348,34 @@
             }, index * 100);
         });
     });
-   document.addEventListener('DOMContentLoaded', function() {
-    const toggleBtn = document.getElementById('toggleProfile');
-    const profileSection = document.getElementById('profileSection');
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
 
-    if (toggleBtn && profileSection) { // <-- important check
-        toggleBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            profileSection.classList.toggle('show');
-            profileSection.scrollIntoView({ behavior: 'smooth' });
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
         });
+    }
+
+    function updateThemeIcon(theme) {
+        if (themeIcon) {
+            if (theme === 'dark') {
+                themeIcon.className = 'bi bi-sun-fill';
+            } else {
+                themeIcon.className = 'bi bi-moon-stars-fill';
+            }
+        }
     }
 });
 

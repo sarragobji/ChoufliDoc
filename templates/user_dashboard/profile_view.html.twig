@@ -1,0 +1,164 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ profileUser.firstName }} {{ profileUser.lastName }} - Profile - ChoufliDoc{% endblock %}
+
+{% block stylesheets %}
+    <link href="{{ asset('css/Dashboard_user.css') }}" rel="stylesheet">
+    <style>
+        .profile-view-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 3rem;
+            color: white;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 1rem;
+        }
+        .profile-picture-placeholder {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 5px solid white;
+            font-size: 4rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        .profile-info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 120px;
+        }
+        .info-value {
+            color: #6c757d;
+            flex: 1;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="profile-view-container">
+    <!-- Navigation -->
+    <div class="mb-4">
+        {% if app.user %}
+            <a href="{{ path('app_user_dashboard') }}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        {% else %}
+            <a href="{{ path('app_home') }}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Home
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        {% if profileUser.profilePicture %}
+            <img src="{{ asset(profileUser.profilePicture) }}" alt="Profile Picture" class="profile-picture">
+        {% else %}
+            <div class="profile-picture-placeholder">
+                <i class="bi bi-person-fill"></i>
+            </div>
+        {% endif %}
+        <h1 class="mb-2">{{ profileUser.firstName }} {{ profileUser.lastName }}</h1>
+        <p class="mb-0 opacity-75">{{ profileUser.email }}</p>
+    </div>
+
+    <!-- Profile Information -->
+    <div class="profile-info-card">
+        <h3 class="mb-4">
+            <i class="bi bi-info-circle me-2"></i>Profile Information
+        </h3>
+        
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="bi bi-person"></i>
+            </div>
+            <div class="info-label">Full Name</div>
+            <div class="info-value">{{ profileUser.firstName }} {{ profileUser.lastName }}</div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="bi bi-envelope"></i>
+            </div>
+            <div class="info-label">Email</div>
+            <div class="info-value">{{ profileUser.email }}</div>
+        </div>
+
+        {% if profileUser.phoneNumber %}
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="bi bi-telephone"></i>
+            </div>
+            <div class="info-label">Phone</div>
+            <div class="info-value">{{ profileUser.phoneNumber }}</div>
+        </div>
+        {% endif %}
+
+        {% if profileUser.birthDate %}
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="bi bi-calendar"></i>
+            </div>
+            <div class="info-label">Birth Date</div>
+            <div class="info-value">{{ profileUser.birthDate|date('F d, Y') }}</div>
+        </div>
+        {% endif %}
+
+        {% if profileUser.address %}
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="bi bi-geo-alt"></i>
+            </div>
+            <div class="info-label">Address</div>
+            <div class="info-value">{{ profileUser.address }}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
