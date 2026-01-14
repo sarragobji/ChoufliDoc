@@ -86,7 +86,14 @@
                             <span class="mr-2 text-gray-600 small">
                                 Dr. {{ app.user.firstName }} {{ app.user.lastName }}
                             </span>
-                            <img class="img-profile rounded-circle" src="{{ asset('img/undraw_profile.svg') }}">
+                            {% if app.user.profilePicture %}
+                                <img class="img-profile rounded-circle"
+                                     src="{{ asset(app.user.profilePicture) }}"
+                                     alt="Profile Picture"
+                                     style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                                <img class="img-profile rounded-circle" src="{{ asset('img/undraw_profile.svg') }}">
+                            {% endif %}
                         </a>
                         <div class="dropdown-menu dropdown-menu-right shadow">
                             <a class="dropdown-item" href="{{ path('app_logout') }}">

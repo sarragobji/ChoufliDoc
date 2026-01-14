@@ -15,9 +15,11 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AppointmentCrudController extends AbstractCrudController
 {
@@ -43,10 +45,28 @@ class AppointmentCrudController extends AbstractCrudController
             $doctor = $this->doctrine->getRepository(User::class)->find(3);
         }
 
+        $patientField = AssociationField::new('patient');
+        
+        // Make patient name clickable on index page
+        if ($pageName === Crud::PAGE_INDEX) {
+            $patientField->formatValue(function ($value, $entity) {
+                if ($entity && $entity->getPatient()) {
+                    $patient = $entity->getPatient();
+                    $patientId = $patient->getIdUser();
+                    $patientName = $patient->getFirstName() . ' ' . $patient->getLastName();
+                    $url = $this->generateUrl('app_user_profile_view', ['id' => $patientId]);
+                    return sprintf('<a href="%s" target="_blank" style="color: #007bff; text-decoration: none;">%s</a>', 
+                        htmlspecialchars($url, ENT_QUOTES, 'UTF-8'), 
+                        htmlspecialchars($patientName, ENT_QUOTES, 'UTF-8'));
+                }
+                return $value ?: '';
+            })->renderAsHtml();
+        }
+
         return [
             IdField::new('idAppointment')->hideOnForm(),
             DateField::new('dateAppointment'),
-            AssociationField::new('patient'),
+            $patientField,
             AssociationField::new('doctor')->setFormTypeOption('data', $doctor),
             ChoiceField::new('status')->setChoices([
                 'Pending' => 'pending',

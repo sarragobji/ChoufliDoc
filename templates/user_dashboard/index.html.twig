@@ -118,25 +118,25 @@
 
     <!-- Stats Cards Section -->
     <div class="stats-grid">
-        <div class="stat-card stat-card-primary" data-count="{{ appointments|length }}">
+        <div class="stat-card stat-card-primary" data-count="{{ allAppointments|default([])|length }}">
             <div class="stat-card-icon">
                 <i class="bi bi-calendar-check-fill"></i>
             </div>
             <div class="stat-card-content">
                 <h3 class="stat-card-label">Total Appointments</h3>
-                <h2 class="stat-card-value" data-target="{{ appointments|length }}">0</h2>
+                <h2 class="stat-card-value" data-target="{{ allAppointments|default([])|length }}">{{ allAppointments|default([])|length }}</h2>
                 <p class="stat-card-desc">Your scheduled appointments</p>
             </div>
             <div class="stat-card-decoration"></div>
         </div>
 
-        <div class="stat-card stat-card-success" data-count="{{ medicalRecords|length }}">
+        <div class="stat-card stat-card-success" data-count="{{ medicalRecords|default([])|length }}">
             <div class="stat-card-icon">
                 <i class="bi bi-file-earmark-medical-fill"></i>
             </div>
             <div class="stat-card-content">
                 <h3 class="stat-card-label">Medical Records</h3>
-                <h2 class="stat-card-value" data-target="{{ medicalRecords|length }}">0</h2>
+                <h2 class="stat-card-value" data-target="{{ medicalRecords|default([])|length }}">{{ medicalRecords|default([])|length }}</h2>
                 <p class="stat-card-desc">Your health records</p>
             </div>
             <div class="stat-card-decoration"></div>
@@ -330,9 +330,12 @@
         };
 
         statValues.forEach(stat => {
-            const target = parseInt(stat.getAttribute('data-target'));
-            if (target > 0) {
+            const target = parseInt(stat.getAttribute('data-target')) || 0;
+            const currentValue = parseInt(stat.textContent) || 0;
+            if (target > 0 && currentValue === 0) {
                 animateValue(stat, 0, target, 1000);
+            } else if (target > 0) {
+                stat.textContent = target;
             }
         });
 

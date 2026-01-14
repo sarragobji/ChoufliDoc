@@ -53,4 +53,24 @@ class AppointmentNotificationService
 
         $this->mailer->send($email);
     }
+
+    public function sendAppointmentCreatedNotification(Appointment $appointment): void
+    {
+        $patient = $appointment->getPatient();
+        $doctor = $appointment->getDoctor();
+
+        $email = (new TemplatedEmail())
+            ->from(new Address('CabinetDR.Labyedh.Slimen@gmail.com', 'ChoufliDoc'))
+            ->to($patient->getEmail())
+            ->subject('Appointment Request Received - ChoufliDoc')
+            ->htmlTemplate('emails/appointment_created.html.twig')
+            ->context([
+                'patient' => $patient,
+                'doctor' => $doctor,
+                'appointment' => $appointment,
+                'appointmentDate' => $appointment->getDateAppointment(),
+            ]);
+
+        $this->mailer->send($email);
+    }
 }

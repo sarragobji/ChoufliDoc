@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Appointment;
 use App\Form\AppointmentType;
 use App\Repository\AppointmentRepository;
+use App\Service\AppointmentNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/appointment')]
 class AppointmentController extends AbstractController
 {
+    public function __construct(
+        private AppointmentNotificationService $notificationService
+    ) {
+    }
     /* ==========================
      * ADMIN – SEE ALL
      * ========================== */
@@ -47,6 +52,14 @@ class AppointmentController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($appointment);
             $em->flush();
+
+            // Send email notification
+            try {
+                $this->notificationService->sendAppointmentCreatedNotification($appointment);
+            } catch (\Exception $e) {
+                // Log error but don't fail the request
+                error_log('Failed to send appointment creation email: ' . $e->getMessage());
+            }
 
             return $this->redirectToRoute('appointment_my');
         }
@@ -147,6 +160,15 @@ class AppointmentController extends AbstractController
             $appointment->setStatus(Appointment::APPOINTMENT_STATUS_PENDING);
             $em->persist($appointment);
             $em->flush();
+            
+            // Send email notification
+            try {
+                $this->notificationService->sendAppointmentCreatedNotification($appointment);
+            } catch (\Exception $e) {
+                // Log error but don't fail the request
+                error_log('Failed to send appointment creation email: ' . $e->getMessage());
+            }
+            
             $this->addFlash('success', 'Your appointment request has been sent successfully.');
             return $this->redirectToRoute('app_user_dashboard');
         }

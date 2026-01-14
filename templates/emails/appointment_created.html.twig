@@ -12,7 +12,7 @@
             padding: 20px;
         }
         .header {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -33,7 +33,7 @@
             margin: 10px 0;
             padding: 10px;
             background: #f8f9fa;
-            border-left: 4px solid #dc3545;
+            border-left: 4px solid #ffc107;
         }
         .footer {
             text-align: center;
@@ -45,12 +45,12 @@
 </head>
 <body>
     <div class="header">
-        <h1>❌ Appointment Rejected</h1>
+        <h1>📅 Appointment Request Received</h1>
     </div>
     <div class="content">
         <p>Dear {{ patient.firstName }} {{ patient.lastName }},</p>
         
-        <p>We regret to inform you that your appointment request has been <strong>rejected</strong>.</p>
+        <p>Thank you for booking an appointment with us! Your appointment request has been <strong>received</strong> and is currently pending approval.</p>
         
         <div class="appointment-details">
             <h3>Appointment Details:</h3>
@@ -61,13 +61,13 @@
                 <strong>Date:</strong> {{ appointmentDate|date('F d, Y') }}
             </div>
             <div class="detail-item">
-                <strong>Status:</strong> <span style="color: #dc3545; font-weight: bold;">Rejected</span>
+                <strong>Status:</strong> <span style="color: #ffc107; font-weight: bold;">Pending</span>
             </div>
         </div>
         
-        <p>We apologize for any inconvenience. Please feel free to book another appointment at a different time that suits both you and the doctor.</p>
+        <p>We will review your appointment request and notify you once it has been accepted or rejected. You will receive an email notification with the final status.</p>
         
-        <p>If you have any questions or concerns, please don't hesitate to contact us.</p>
+        <p>If you have any questions or need to make changes, please contact us as soon as possible.</p>
         
         <p>Best regards,<br>
         <strong>ChoufliDoc Team</strong></p>

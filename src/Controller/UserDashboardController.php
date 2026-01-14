@@ -41,7 +41,10 @@ final class UserDashboardController extends AbstractController
             return $this->redirectToRoute('app_user_dashboard');
         }
 
-        // ===== Fetch upcoming appointments =====
+        // ===== Fetch ALL appointments for count =====
+        $allAppointments = $appointmentRepo->findBy(['patient' => $user]);
+        
+        // ===== Fetch upcoming appointments for display =====
         $appointments = $appointmentRepo->createQueryBuilder('a')
             ->where('a.patient = :user')
             ->andWhere('a.dateAppointment >= :today')
@@ -57,6 +60,7 @@ final class UserDashboardController extends AbstractController
         // ===== Render template with profile form =====
         return $this->render('user_dashboard/index.html.twig', [
             'appointments' => $appointments,
+            'allAppointments' => $allAppointments, // For count display
             'medicalRecords' => $medicalRecords,
             'profileForm' => $profileForm->createView(),
         ]);
@@ -108,6 +112,7 @@ final class UserDashboardController extends AbstractController
     }
 
     #[Route('/user/profile/{id}', name: 'app_user_profile_view')]
+    #[IsGranted('ROLE_USER')]
     public function viewProfile(int $id, UserRepository $userRepository): Response
     {
         $user = $userRepository->find($id);
