@@ -468,6 +468,10 @@
     max-width: 400px;
 }
 
+.prescription-cell {
+    max-width: 400px;
+}
+
 /* =========================
    STATUS BADGES
 ========================= */
@@ -513,6 +517,26 @@
 }
 
 .diagnosis-pending {
+    background: rgba(156, 163, 175, 0.1);
+    color: var(--gray-600);
+}
+
+.prescription-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.prescription-complete {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--primary-dark);
+}
+
+.prescription-pending {
     background: rgba(156, 163, 175, 0.1);
     color: var(--gray-600);
 }

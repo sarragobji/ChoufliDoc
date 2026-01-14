@@ -263,6 +263,7 @@
                                 <th><i class="bi bi-calendar3"></i> Date</th>
                                 <th><i class="bi bi-clipboard-pulse"></i> Reason</th>
                                 <th><i class="bi bi-heart-pulse"></i> Diagnosis</th>
+                                <th><i class="bi bi-prescription"></i> Prescription</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -292,6 +293,21 @@
                                                 </span>
                                             {% else %}
                                                 <span class="diagnosis-badge diagnosis-pending">
+                                                    <i class="bi bi-clock"></i>
+                                                    Pending
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="prescription-cell">
+                                            {% if record.prescription %}
+                                                <span class="prescription-badge prescription-complete">
+                                                    <i class="bi bi-check-circle-fill"></i>
+                                                    {{ record.prescription|length > 50 ? record.prescription|slice(0, 50) ~ '...' : record.prescription }}
+                                                </span>
+                                            {% else %}
+                                                <span class="prescription-badge prescription-pending">
                                                     <i class="bi bi-clock"></i>
                                                     Pending
                                                 </span>
