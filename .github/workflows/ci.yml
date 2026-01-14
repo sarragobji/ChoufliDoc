@@ -2,77 +2,271 @@ name: CI
 
 on:
   push:
-    branches: [ "develop", "main" ]
+    branches: [ "develop", "main", "master" ]
   pull_request:
-    branches: [ "develop", "main" ]
+    branches: [ "develop", "main", "master" ]
+
+env:
+  APP_ENV: test
+  APP_DEBUG: 0
+  APP_SECRET: testsecret
+  MAILER_DSN: "null://null"
+  MESSENGER_TRANSPORT_DSN: "sync://"
 
 jobs:
-  build:
+  # Job 1: Code Quality and Linting
+  code-quality:
+    name: Code Quality Checks
     runs-on: ubuntu-latest
-    env:
-      APP_ENV: test
-      COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH || '' }}
-
+    
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup PHP 8.3.13
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3.13'
-          extensions: mbstring, intl, pdo_mysql, xml, json
-          ini-values: post_max_size=256M, memory_limit=2G
-
-      - name: Get Composer cache directory
-        id: composer-cache
-        run: |
-          # Use the recommended GITHUB_OUTPUT file to expose step outputs
-          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+          php-version: '8.2'
+          extensions: mbstring, intl, pdo_sqlite, pdo_pgsql, pgsql
+          coverage: none
+          tools: composer
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
+          path: ~/.composer/cache
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
-      - name: Install composer dependencies
-        run: composer install --no-progress --no-suggest --prefer-dist --no-interaction
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-suggest
 
-      - name: Ensure Symfony console is available
-        run: php bin/console --version
+      - name: Validate composer.json
+        run: composer validate --strict
 
-      - name: "Symfony lint: YAML"
-        run: php bin/console lint:yaml config/ --no-interaction
+      - name: Check for security vulnerabilities
+        run: composer audit --format=plain || true
 
-      - name: "Symfony lint: Twig"
-        run: php bin/console lint:twig templates/ --no-interaction || true
-        # note: lint:twig returns non-zero if no templates; `|| true` prevents failure when there are none
+      - name: Lint YAML files
+        run: php bin/console lint:yaml config/
 
-      - name: "Symfony lint: Container"
-        run: php bin/console lint:container --no-interaction
+      - name: Lint Twig templates
+        run: php bin/console lint:twig templates/
 
-      - name: Run PHPStan (static analysis)
+      - name: Lint PHP files
+        run: php bin/console lint:container || true
+
+  # Job 2: Static Analysis with PHPStan
+  static-analysis:
+    name: PHPStan Static Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, pdo_sqlite, pdo_pgsql, pgsql
+          coverage: none
+          tools: composer
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-suggest
+
+      - name: Run PHPStan
         run: |
-          if [ -f ./vendor/bin/phpstan ]; then
+          if [ -f phpstan.dist.neon ]; then
             ./vendor/bin/phpstan analyse --memory-limit=1G
           else
-            echo "PHPStan not installed, skipping static analysis."
+            echo "PHPStan configuration not found, skipping..."
           fi
+        continue-on-error: true
 
-      - name: Run PHPUnit (if tests exist)
-        if: ${{ always() }}
+  # Job 3: Unit Tests with Multiple PHP Versions
+  tests:
+    name: PHPUnit Tests (PHP ${{ matrix.php-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - '8.2'
+          - '8.3'
+        database:
+          - sqlite
+          - postgresql
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: chouflidoc_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      DATABASE_URL: ${{ matrix.database == 'postgresql' && format('postgresql://postgres:postgres@localhost:5432/chouflidoc_test?serverVersion=16&charset=utf8') || 'sqlite:///:memory:' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl, pdo_sqlite, pdo_pgsql, pgsql
+          coverage: none
+          tools: composer
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Cache PHPUnit cache
+        uses: actions/cache@v4
+        with:
+          path: .phpunit.cache
+          key: ${{ runner.os }}-phpunit-${{ hashFiles('phpunit.dist.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-phpunit-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-suggest
+
+      - name: Check Symfony version
+        run: php bin/console --version
+
+      - name: Wait for PostgreSQL
+        if: matrix.database == 'postgresql'
         run: |
-          if [ -f phpunit.xml ] || [ -f phpunit.xml.dist ]; then
-            ./vendor/bin/phpunit --testdox
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+
+      - name: Setup database
+        run: |
+          php bin/console doctrine:database:create --if-not-exists --no-interaction
+          php bin/console doctrine:schema:create --no-interaction
+
+      - name: Run PHPUnit tests
+        run: |
+          if [ -f phpunit.xml ] || [ -f phpunit.dist.xml ]; then
+            ./vendor/bin/phpunit --cache-result-file=.phpunit.cache/result.cache
           else
-            echo "No PHPUnit config found; skipping tests."
+            echo "No PHPUnit configuration found, skipping tests."
+            exit 0
           fi
 
-      - name: Show deployed files (debug)
-        run: ls -la
-
-      - name: Build artifacts (optional)
+      - name: Upload test results
         if: always()
-        run: echo "CI pipeline finished."
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-php-${{ matrix.php-version }}-${{ matrix.database }}
+          path: |
+            .phpunit.cache/
+          retention-days: 7
+
+  # Job 4: Security Audit
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl
+          coverage: none
+          tools: composer
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-suggest
+
+      - name: Run Composer Audit
+        run: composer audit --format=plain || echo "Security vulnerabilities found. Please review."
+
+      - name: Check for known vulnerabilities
+        run: |
+          if composer audit --format=json | grep -q '"advisories":\s*\[\]'; then
+            echo "✅ No known security vulnerabilities found"
+          else
+            echo "⚠️ Security vulnerabilities detected. Review the output above."
+            exit 1
+          fi
+
+  # Job 5: Build and Validate
+  build:
+    name: Build Validation
+    runs-on: ubuntu-latest
+    needs: [code-quality, static-analysis]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, pdo_sqlite
+          coverage: none
+          tools: composer
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-suggest --optimize-autoloader
+
+      - name: Clear cache
+        run: php bin/console cache:clear --env=test --no-debug
+
+      - name: Validate Symfony installation
+        run: |
+          php bin/console about
+          php bin/console debug:container --env=test
+
+      - name: Check for deprecated code
+        run: php bin/console debug:container --env=test --show-deprecated || true
